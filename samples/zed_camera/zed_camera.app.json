@@ -1,0 +1,59 @@
+{
+  "name": "zed_camera",
+  "modules": [
+    "perception",
+    "zed"
+  ],
+  "config": {
+    "zed": {
+      "isaac::ZedCamera": {
+        "resolution": "1280x720",
+        "tick_period": "60Hz"
+      }
+    },
+    "websight": {
+      "WebsightServer": {
+        "webroot": "packages/sight/webroot",
+        "assetroot": "../isaac_assets",
+        "port": 3000,
+        "ui_config": {
+          "windows": {
+            "Right Camera": {
+              "renderer": "2d",
+              "channels": [
+                {
+                  "name": "zed_camera/zed/isaac::ZedCamera/right_rgb_thumbnail"
+                }
+              ]
+            },
+            "Left Camera": {
+              "renderer": "2d",
+              "channels": [
+                {
+                  "name": "zed_camera/zed/isaac::ZedCamera/left_rgb_thumbnail"
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "graph": {
+    "nodes": [
+      {
+        "name": "zed",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "isaac::ZedCamera",
+            "type": "isaac::ZedCamera"
+          }
+        ]
+      }
+    ]
+  }
+}

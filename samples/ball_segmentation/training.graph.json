@@ -1,0 +1,176 @@
+{
+  "nodes": [
+    {
+      "name": "sim_camera",
+      "components": [
+        {
+          "name": "message_ledger",
+          "type": "isaac::alice::MessageLedger"
+        },
+        {
+          "name": "isaac.alice.TcpSubscriber",
+          "type": "isaac::alice::TcpSubscriber"
+        }
+      ]
+    },
+    {
+      "name": "color_camera_encoder",
+      "components": [
+        {
+          "name": "message_ledger",
+          "type": "isaac::alice::MessageLedger"
+        },
+        {
+          "name": "isaac.ml.ColorCameraEncoder",
+          "type": "isaac::ml::ColorCameraEncoder"
+        }
+      ]
+    },
+    {
+      "name": "color_camera_visualizer",
+      "components": [
+        {
+          "name": "isaac.alice.MessageLedger",
+          "type": "isaac::alice::MessageLedger"
+        },
+        {
+          "name": "isaac.viewers.ColorCameraViewer",
+          "type": "isaac::viewers::ColorCameraViewer"
+        }
+      ]
+    },
+    {
+      "name": "segmentation_visualizer",
+      "components": [
+        {
+          "name": "isaac.alice.MessageLedger",
+          "type": "isaac::alice::MessageLedger"
+        },
+        {
+          "name": "isaac.viewers.SegmentationCameraViewer",
+          "type": "isaac::viewers::SegmentationCameraViewer"
+        }
+      ]
+    },
+    {
+      "name": "segmentation_encoder",
+      "components": [
+        {
+          "name": "message_ledger",
+          "type": "isaac::alice::MessageLedger"
+        },
+        {
+          "name": "isaac.ml.SegmentationEncoder",
+          "type": "isaac::ml::SegmentationEncoder"
+        }
+      ]
+    },
+    {
+      "name": "tensor_synchronizer",
+      "components": [
+        {
+          "name": "message_ledger",
+          "type": "isaac::alice::MessageLedger"
+        },
+        {
+          "name": "isaac.ml.TensorSynchronization",
+          "type": "isaac::ml::TensorSynchronization"
+        }
+      ]
+    },
+    {
+      "name": "ball_navigation_training_samples",
+      "components": [
+        {
+          "name": "message_ledger",
+          "type": "isaac::alice::MessageLedger"
+        },
+        {
+          "name": "isaac.ml.SampleAccumulator",
+          "type": "isaac::ml::SampleAccumulator"
+        }
+      ]
+    },
+    {
+      "name": "camera_teleportation",
+      "components": [
+        {
+          "name": "message_ledger",
+          "type": "isaac::alice::MessageLedger"
+        },
+        {
+          "name": "isaac.ml.Teleportation",
+          "type": "isaac::ml::Teleportation"
+        }
+      ]
+    },
+    {
+      "name": "ball_teleportation",
+      "components": [
+        {
+          "name": "message_ledger",
+          "type": "isaac::alice::MessageLedger"
+        },
+        {
+          "name": "isaac.ml.Teleportation",
+          "type": "isaac::ml::Teleportation"
+        }
+      ]
+    },
+    {
+      "name": "actor_group_rigid_command_publisher",
+      "components": [
+        {
+          "name": "message_ledger",
+          "type": "isaac::alice::MessageLedger"
+        },
+        {
+          "name": "isaac.alice.TcpPublisher",
+          "type": "isaac::alice::TcpPublisher"
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "sim_camera/isaac.alice.TcpSubscriber/ColorSensor",
+      "target": "color_camera_visualizer/isaac.viewers.ColorCameraViewer/color_listener"
+    },
+    {
+      "source": "sim_camera/isaac.alice.TcpSubscriber/ColorSensor",
+      "target": "color_camera_encoder/isaac.ml.ColorCameraEncoder/rgb_image"
+    },
+    {
+      "source": "sim_camera/isaac.alice.TcpSubscriber/SegmentationSensor",
+      "target": "segmentation_visualizer/isaac.viewers.SegmentationCameraViewer/segmentation_listener"
+    },
+    {
+      "source": "sim_camera/isaac.alice.TcpSubscriber/SegmentationSensor",
+      "target": "segmentation_encoder/isaac.ml.SegmentationEncoder/segmentation"
+    },
+    {
+      "source": "color_camera_encoder/isaac.ml.ColorCameraEncoder/tensor",
+      "target": "tensor_synchronizer/isaac.ml.TensorSynchronization/tensor1"
+    },
+    {
+      "source": "segmentation_encoder/isaac.ml.SegmentationEncoder/tensor",
+      "target": "tensor_synchronizer/isaac.ml.TensorSynchronization/tensor2"
+    },
+    {
+      "source": "tensor_synchronizer/isaac.ml.TensorSynchronization/tensorlist",
+      "target": "ball_navigation_training_samples/isaac.ml.SampleAccumulator/samples"
+    },
+    {
+      "source": "camera_teleportation/isaac.ml.Teleportation/rigid_command",
+      "target": "actor_group_rigid_command_publisher/isaac.alice.TcpPublisher/rigid_command_carter"
+    },
+    {
+      "source": "ball_teleportation/isaac.ml.Teleportation/rigid_command",
+      "target": "actor_group_rigid_command_publisher/isaac.alice.TcpPublisher/rigid_command_sphere"
+    },
+    {
+      "source": "camera_teleportation/isaac.ml.Teleportation/relative_frame_cmd",
+      "target": "ball_teleportation/isaac.ml.Teleportation/relative_frame"
+    }
+  ]
+}

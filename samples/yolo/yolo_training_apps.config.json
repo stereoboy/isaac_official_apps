@@ -1,0 +1,83 @@
+{
+  "sim_camera": {
+    "isaac.alice.TcpSubscriber": {
+      "port": 5003,
+      "reconnect_interval": 0.5,
+      "host": "localhost"
+    }
+  },
+  "detection_encoder": {
+    "isaac.ml.DetectionEncoder": {
+      "class_names": ["Ball", "Bowling_Pin", "Chair", "Plants", "Trashcan", "character"],
+      "area_threshold": 100
+    }
+  },
+  "color_camera_encoder": {
+    "isaac.ml.ColorCameraEncoder": {
+      "rows": 256,
+      "cols": 512,
+      "pixel_normalization_mode": "PositiveNegative"
+    }
+  },
+  "color_camera_visualizer": {
+    "isaac.viewers.ColorCameraViewer": {
+      "camera_name": "left_camera"
+    }
+  },
+  "object_detection_training_samples": {
+    "isaac.ml.SampleAccumulator": {
+      "sample_buffer_size": 32
+    }
+  },
+  "camera_teleportation": {
+    "isaac.ml.Teleportation": {
+      "interval": 5.0,
+      "name": "carter_1",
+      "min": [-25.8, 60.2, 0.2],
+      "max": [4.8, 65.2, 0.5],
+      "min_yaw": -3.14,
+      "max_yaw": 3.14,
+      "enable_translation_x": true,
+      "enable_translation_y": true,
+      "enable_translation_z": true,
+      "enable_yaw": true,
+      "tick_period": "10.0"
+    }
+  },
+  "actor_group_rigid_command_publisher": {
+    "isaac.alice.TcpPublisher": {
+      "port": 5004,
+      "reconnect_interval": 0.5,
+      "host": "localhost"
+    }
+  },
+  "websight": {
+    "WebsightServer": {
+      "webroot": "packages/sight/webroot",
+      "assetroot": "../isaac_assets",
+      "port": 3000,
+      "ui_config": {
+        "windows": {
+          "Object Detection - Color": {
+            "renderer": "2d",
+            "dims": {
+              "width": 512,
+              "height": 256
+            },
+            "channels": [
+              {
+                "name": "yolo_training/color_camera_visualizer/isaac.viewers.ColorCameraViewer/Color",
+                "active": true
+              },
+              {
+                "name": "yolo_training/bounding_box_visualizer/isaac.viewers.DetectionsViewer/detections",
+                "active": true
+              }
+            ]
+          }
+        },
+        "assets": {}
+      }
+    }
+  }
+}

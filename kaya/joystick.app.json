@@ -1,0 +1,126 @@
+{
+  "name": "joystick",
+  "modules": [
+    "kaya_base",
+    "navigation",
+    "sensors:joystick"
+  ],
+  "config_files": [
+    "apps/kaya/robots/kaya_v2.config.json"
+  ],
+  "config": {
+    "joystick": {
+      "isaac.Joystick": {
+        "tick_period": "50ms"
+      }
+    },
+    "holonomic_joystick": {
+      "isaac.alice.FailsafeHeartbeat": {
+        "interval": 0.25,
+        "failsafe_name": "Kaya_failsafe",
+        "heartbeat_name": "deadman_switch"
+      },
+      "isaac.navigation.RobotRemoteControl": {
+        "tick_period": "10ms",
+        "differential_joystick": false,
+        "linear_speed_max": 0.75,
+        "angular_speed_max": 3.0
+      }
+    },
+    "kaya_odometry": {
+      "isaac.navigation.HolonomicBaseWheelImuOdometry": {
+        "tick_period": "100Hz",
+        "use_imu": false
+      }
+    },
+    "kaya_driver": {
+      "isaac.KayaBaseDriver": {
+        "tick_period": "100ms",
+        "max_safe_speed": 0.75,
+        "max_angular_speed": 3.0,
+        "baudrate": "1000000"
+      },
+      "isaac.alice.Failsafe": {
+        "name": "Kaya_failsafe"
+      }
+    }
+  },
+  "graph": {
+    "nodes": [
+      {
+        "name": "kaya_odometry",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "isaac.navigation.HolonomicBaseWheelImuOdometry",
+            "type": "isaac::navigation::HolonomicBaseWheelImuOdometry"
+          }
+        ]
+      },
+      {
+        "name": "joystick",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "isaac.Joystick",
+            "type": "isaac::Joystick"
+          }
+        ]
+      },
+      {
+        "name": "kaya_driver",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "isaac.KayaBaseDriver",
+            "type": "isaac::KayaBaseDriver"
+          },
+          {
+            "name": "isaac.alice.Failsafe",
+            "type": "isaac::alice::Failsafe"
+          }
+        ]
+      },
+      {
+        "name": "holonomic_joystick",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "isaac.navigation.RobotRemoteControl",
+            "type": "isaac::navigation::RobotRemoteControl"
+          },
+          {
+            "name": "isaac.alice.FailsafeHeartbeat",
+            "type": "isaac::alice::FailsafeHeartbeat"
+          }
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "source": "joystick/isaac.Joystick/js_state",
+        "target": "holonomic_joystick/isaac.navigation.RobotRemoteControl/js_state"
+      },
+      {
+        "source": "kaya_driver/isaac.KayaBaseDriver/state",
+        "target": "kaya_odometry/isaac.navigation.HolonomicBaseWheelImuOdometry/state"
+      },
+      {
+        "source": "holonomic_joystick/isaac.navigation.RobotRemoteControl/segway_cmd",
+        "target": "kaya_driver/isaac.KayaBaseDriver/command"
+      }
+    ]
+  }
+}

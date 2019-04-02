@@ -1,0 +1,394 @@
+{
+  "name": "gmapping_distributed_kaya",
+  "modules": [
+    "imu",
+    "kaya_base",
+    "navigation",
+    "perception",
+    "planner",
+    "realsense",
+    "sensors:joystick",
+    "viewers"
+  ],
+  "config_files": [
+    "apps/kaya/robots/kaya_v2.config.json"
+  ],
+  "config": {
+    "image_flattening": {
+      "isaac.perception.DepthImageFlattening": {
+        "height_min": 0.08,
+        "height_max": 0.20,
+        "ground_frame": "robot",
+        "camera_frame": "camera",
+        "range_delta": 0.01,
+        "sector_delta": 0.008,
+        "max_distance": 3.5
+      },
+      "isaac.alice.Throttle": {
+        "data_channel": "input",
+        "output_channel": "output",
+        "minimum_interval": 0.1,
+        "use_signal_channel": false
+      }
+    },
+    "joystick": {
+      "isaac.Joystick": {
+        "tick_period": "50ms"
+      }
+    },
+    "holonomic_joystick": {
+      "isaac.alice.FailsafeHeartbeat": {
+        "interval": 0.25,
+        "failsafe_name": "Kaya_failsafe",
+        "heartbeat_name": "deadman_switch"
+      },
+      "isaac.navigation.RobotRemoteControl": {
+        "tick_period": "10ms",
+        "differential_joystick": false,
+        "linear_speed_max": 1.0,
+        "angular_speed_max": 1.0
+      }
+    },
+    "kaya_driver": {
+      "isaac.KayaBaseDriver": {
+        "tick_period": "100ms",
+        "baudrate": "1000000"
+      },
+      "isaac.alice.Failsafe": {
+        "name": "Kaya_failsafe"
+      }
+    },
+    "local_map": {
+      "isaac.navigation.LocalMap": {
+        "sensor_frame": "camera",
+        "map_decay_factor": 0.98
+      }
+    },
+    "camera": {
+      "realsense": {
+        "rows": 480,
+        "cols": 848,
+        "framerate": 30
+      }
+    },
+    "kaya_odometry": {
+      "isaac.navigation.HolonomicBaseWheelImuOdometry": {
+        "tick_period": "100Hz",
+        "use_imu": true
+      }
+    },
+    "viewer": {
+      "depth": {
+        "camera_name": "camera",
+        "max_visualization_depth": 2
+      },
+      "color": {
+        "camera_name": "camera"
+      }
+    },
+    "tcp_publisher": {
+      "isaac.alice.TcpPublisher": {
+        "port": 5000
+      }
+    },
+    "control": {
+      "isaac.planner.HolonomicBaseControl": {
+        "manual_mode_channel": "holonomic_joystick/isaac.navigation.RobotRemoteControl/manual_mode",
+        "use_tick_time": true,
+        "tick_period": "100Hz"
+      }
+    },
+    "imu": {
+      "imu_hw": {
+        "i2c_device_id": 1,
+        "tick_period": "100Hz"
+      }
+    },
+    "websight": {
+      "WebsightServer": {
+        "webroot": "packages/sight/webroot",
+        "assetroot": "../isaac_assets",
+        "port": 3000,
+        "ui_config": {
+          "windows": {
+            "Mapper Kaya - Camera": {
+              "renderer": "2d",
+              "dims": {
+                "width": 640,
+                "height": 360
+              },
+              "channels": [
+                {
+                  "name": "gmapping_distributed_kaya/viewer/color/Color"
+                }
+              ]
+            },
+            "Mapper Kaya - Depth": {
+              "renderer": "2d",
+              "dims": {
+                "width": 640,
+                "height": 360
+              },
+              "channels": [
+                {
+                  "name": "gmapping_distributed_kaya/viewer/depth/Depth"
+                }
+              ]
+            },
+            "Mapper Kaya - Odometry": {
+              "renderer": "plot",
+              "channels": [
+                {
+                  "name": "gmapping_distributed_kaya/kaya_odometry/isaac.navigation.HolonomicBaseWheelImuOdometry/state.heading",
+                  "active": true
+                },
+                {
+                  "name":  "gmapping_distributed_kaya/kaya_odometry/isaac.navigation.HolonomicBaseWheelImuOdometry/state.pos_x",
+                  "active": true
+                },
+                {
+                  "name":  "gmapping_distributed_kaya/kaya_odometry/isaac.navigation.HolonomicBaseWheelImuOdometry/state.pos_y",
+                  "active": true
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "graph": {
+    "nodes": [
+      {
+        "name": "image_flattening",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "isaac.perception.DepthImageFlattening",
+            "type": "isaac::perception::DepthImageFlattening"
+          },
+          {
+            "name": "isaac.alice.Throttle",
+            "type": "isaac::alice::Throttle"
+          }
+        ]
+      },
+      {
+        "name": "control",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "isaac.planner.HolonomicBaseControl",
+            "type": "isaac::planner::HolonomicBaseControl"
+          }
+        ]
+      },
+      {
+        "name": "imu",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "imu_hw",
+            "type": "isaac::imu::IioBmi160"
+          },
+          {
+            "name": "imu_corrector",
+            "type": "isaac::imu::ImuCorrector"
+          }
+        ]
+      },
+      {
+        "name": "joystick",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "isaac.Joystick",
+            "type": "isaac::Joystick"
+          }
+        ]
+      },
+      {
+        "name": "tcp_publisher",
+        "components": [
+          {
+            "name": "isaac.alice.MessageLedger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "isaac.alice.TcpPublisher",
+            "type": "isaac::alice::TcpPublisher"
+          }
+        ]
+      },
+      {
+        "name": "kaya_driver",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "isaac.KayaBaseDriver",
+            "type": "isaac::KayaBaseDriver"
+          },
+          {
+            "name": "isaac.alice.Failsafe",
+            "type": "isaac::alice::Failsafe"
+          }
+        ]
+      },
+      {
+        "name": "holonomic_joystick",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "isaac.navigation.RobotRemoteControl",
+            "type": "isaac::navigation::RobotRemoteControl"
+          },
+          {
+            "name": "isaac.alice.FailsafeHeartbeat",
+            "type": "isaac::alice::FailsafeHeartbeat"
+          }
+        ]
+      },
+      {
+        "name": "camera",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "realsense_pose",
+            "type": "isaac::alice::PoseInitializer"
+          },
+          {
+            "name": "realsense",
+            "type": "isaac::RealsenseCameraSimple"
+          }
+        ]
+      },
+      {
+        "name": "local_map",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "isaac.navigation.LocalMap",
+            "type": "isaac::navigation::LocalMap"
+          }
+        ]
+      },
+      {
+        "name": "viewer",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "depth",
+            "type": "isaac::viewers::DepthCameraViewer"
+          },
+          {
+            "name": "color",
+            "type": "isaac::viewers::ColorCameraViewer"
+          }
+        ]
+      },
+      {
+        "name": "kaya_odometry",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "isaac.navigation.HolonomicBaseWheelImuOdometry",
+            "type": "isaac::navigation::HolonomicBaseWheelImuOdometry"
+          }
+        ]
+      },
+      {
+        "name": "shared_robot_model",
+        "components": [
+          {
+            "name": "RangeScanModel",
+            "type": "isaac::navigation::RangeScanModelFlatloc"
+          },
+          {
+            "name": "DifferentialBaseModel",
+            "type": "isaac::planner::DifferentialBaseModel"
+          }
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "source": "camera/realsense/depth",
+        "target": "image_flattening/isaac.alice.Throttle/input"
+      },
+      {
+        "source": "camera/realsense/depth",
+        "target": "image_flattening/isaac.perception.DepthImageFlattening/depth"
+      },
+      {
+        "source": "joystick/isaac.Joystick/js_state",
+        "target": "holonomic_joystick/isaac.navigation.RobotRemoteControl/js_state"
+      },
+      {
+        "source": "holonomic_joystick/isaac.navigation.RobotRemoteControl/segway_cmd",
+        "target": "kaya_driver/isaac.KayaBaseDriver/command"
+      },
+      {
+        "source": "control/isaac.planner.HolonomicBaseControl/cmd",
+        "target": "holonomic_joystick/isaac.navigation.RobotRemoteControl/ctrl"
+      },
+      {
+        "source": "imu/imu_hw/imu_raw",
+        "target": "imu/imu_corrector/raw"
+      },
+      {
+        "source": "imu/imu_corrector/corrected",
+        "target": "kaya_odometry/isaac.navigation.HolonomicBaseWheelImuOdometry/imu"
+      },
+      {
+        "source": "camera/realsense/depth",
+        "target": "viewer/depth/depth_listener"
+      },
+      {
+        "source": "camera/realsense/color",
+        "target": "viewer/color/color_listener"
+      },
+      {
+        "source": "kaya_driver/isaac.KayaBaseDriver/state",
+        "target": "kaya_odometry/isaac.navigation.HolonomicBaseWheelImuOdometry/state"
+      },
+      {
+        "source": "image_flattening/isaac.perception.DepthImageFlattening/flatscan",
+        "target": "tcp_publisher/isaac.alice.TcpPublisher/flatscan"
+      },
+      {
+        "source": "kaya_odometry/isaac.navigation.HolonomicBaseWheelImuOdometry/odometry",
+        "target": "tcp_publisher/isaac.alice.TcpPublisher/odometry"
+      }
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "nodes": [
+    {
+      "name": "ping_node",
+      "components": [
+        {
+          "name": "ping_component",
+          "type": "isaac::alice::PyCodelet"
+        }
+      ]
+    }
+  ],
+  "edges": [
+  ]
+}

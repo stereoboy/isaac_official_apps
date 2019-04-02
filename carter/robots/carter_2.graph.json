@@ -1,0 +1,14 @@
+{
+  "nodes": [
+    {
+      "name": "pan_tilt",
+      "components": [
+        {
+          "name": "message_ledger",
+          "type": "isaac::alice::MessageLedger"
+        }
+      ]
+    }
+  ],
+  "edges": [ ]
+}

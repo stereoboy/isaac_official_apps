@@ -1,0 +1,37 @@
+{
+  "scan_accumulator": {
+    "isaac.perception.ScanAccumulator": {
+      "min_count": 1800
+    }
+  },
+  "range_scan_flattening": {
+    "isaac.perception.RangeScanFlattening": {
+      "height_min": -0.62,
+      "height_max": 0.53
+    }
+  },
+  "vlp16": {
+    "lidar_initializer": {
+      "lhs_frame": "robot",
+      "rhs_frame": "lidar",
+      "pose": [1.0, 0.0, 0.0, 0.0, -0.04, 0.0, 0.77]
+    }
+  },
+  "camera": {
+    "left_camera_initializer": {
+      "lhs_frame": "robot",
+      "rhs_frame": "left_camera",
+      "pose": [0.5, -0.5, 0.5, -0.5, 0.11, 0.06, 1.13]
+    },
+    "right_camera_initializer": {
+      "lhs_frame": "robot",
+      "rhs_frame": "right_camera",
+      "pose": [0.5, -0.5, 0.5, -0.5, 0.11, -0.06, 1.13]
+    }
+  },
+  "pan_tilt": {
+    "isaac.PanTilt": {
+      "usb_port": "/dev/ttyUSB0"
+    }
+  }
+}

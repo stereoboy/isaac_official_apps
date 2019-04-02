@@ -1,0 +1,96 @@
+{
+  "name": "stereo_vo",
+  "modules": [
+    "perception:stereo_visual_odometry",
+    "viewers",
+    "zed"
+  ],
+  "config": {
+    "zed": {
+      "zed": {
+        "resolution": "672x376",
+        "gray_scale": true,
+        "tick_period": "60Hz"
+      }
+    },
+    "websight": {
+      "WebsightServer": {
+        "port": 3000,
+        "ui_config": {
+          "windows": {
+            "left camera": {
+              "renderer": "2d",
+              "channels": [
+                {
+                  "name": "stereo_vo/zed/zed/left_gray_thumbnail",
+                  "active": true
+                }
+              ]
+            },
+            "Camera Pose": {
+              "renderer": "3d",
+              "dims": {
+                "width": 1280,
+                "height": 720
+              },
+              "channels": [
+                {
+                  "name": "stereo_vo/stereo_vo/stereo_vo/current_pose",
+                  "active": true
+                },
+                {
+                  "name": "stereo_vo/stereo_vo/stereo_vo/pose_trail",
+                  "active": true
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "graph": {
+    "nodes": [
+      {
+        "name": "zed",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "zed",
+            "type": "isaac::ZedCamera"
+          }
+        ]
+      },
+      {
+        "name": "stereo_vo",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "stereo_vo",
+            "type": "isaac::StereoVisualOdometry"
+          }
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "source": "zed/zed/left_camera_gray",
+        "target": "stereo_vo/stereo_vo/left"
+      },
+      {
+        "source": "zed/zed/right_camera_gray",
+        "target": "stereo_vo/stereo_vo/right"
+      },
+      {
+        "source": "zed/zed/extrinsics",
+        "target": "stereo_vo/stereo_vo/extrinsics"
+      }
+    ]
+  }
+}

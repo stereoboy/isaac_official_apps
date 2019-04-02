@@ -1,0 +1,54 @@
+{
+  "name" : "image_undistortion",
+  "modules" : [
+      "//packages/perception",
+      "zed"
+  ],
+  "graph":
+  {
+    "nodes": [
+        {
+            "name": "zed",
+            "components": [
+                {
+                    "name": "ml",
+                    "type": "isaac::alice::MessageLedger"
+                },
+                {
+                    "name": "isaac.sensors.ZedCamera",
+                    "type": "isaac::ZedCamera"
+                }
+            ]
+        },
+        {
+            "name": "image_undistortion",
+            "components": [
+                {
+                    "name": "ml",
+                    "type": "isaac::alice::MessageLedger"
+                },
+                {
+                    "name": "isaac.perception.ImageUndistortion",
+                    "type": "isaac::perception::ImageUndistortion"
+                }
+            ]
+        }
+    ],
+    "edges": [
+        {
+            "source": "zed/isaac.sensors.ZedCamera/left_camera_rgb",
+            "target": "image_undistortion/isaac.perception.ImageUndistortion/input_image"
+        }
+    ]
+  },
+  "config":
+  {
+    "zed": {
+        "isaac.sensors.ZedCamera": {
+            "resolution": "1280x720",
+            "tick_period": "30Hz",
+            "gray_scale": false
+        }
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "name": "carter_sim",
+  "config_files": [
+    "apps/carter_sim/navigation.config.json",
+    "apps/carter_sim/carter.config.json"
+  ],
+  "graph_files": [
+    "apps/carter_sim/navigation.graph.json",
+    "apps/carter_sim/carter.graph.json"
+  ],
+  "modules": [
+    "map",
+    "navigation",
+    "perception",
+    "planner",
+    "viewers",
+    "flatsim"
+  ],
+  "config": {},
+  "graph": {
+    "nodes": [],
+    "edges": [
+      {
+        "source": "control/isaac.planner.DifferentialBaseControl/cmd",
+        "target": "base_simulation/isaac.flatsim.DifferentialBaseSimulator/diff_base_command"
+      }
+    ]
+  }
+}

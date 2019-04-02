@@ -1,0 +1,166 @@
+{
+  "robot_pose_initializer": {
+    "initial_pose": {
+      "lhs_frame": "world",
+      "rhs_frame": "robot_init",
+      "pose": [0.0, 0.0, 0.0, 1.0, 25.0, 20.0, 0.0],
+      "attach_interactive_marker": true
+    }
+  },
+  "map": {
+    "occupancy": {
+      "cell_size": 0.1,
+      "filename": "apps/assets/maps/nvidia_R_180306.png"
+    },
+    "waypoints": {
+      "vis_cell_size": 0.1,
+      "waypoints": {
+        "kitchen": {
+          "pose": [1,0,0,0,45.0,20.3,0],
+          "color": [255,128,0]
+        },
+        "atrium": {
+          "pose": [1,0,0,0,36.2,29.4,0],
+          "color": [32,220,64]
+        },
+        "david_desk": {
+          "pose": [1,0,0,0,39.3,15.9,0],
+          "color": [220,16,16],
+          "radius": 0.5
+        },
+        "column hallway": {
+          "pose": [1,0,0,0,16.9,19.5,0],
+          "color": [230,16,230],
+          "radius": 1.5
+        }
+      },
+      "tick_period": "1.0"
+    },
+    "restricted_area": {
+      "polygons": {
+        "atrium": {
+          "points": [
+            [30.4, 33.0],
+            [42.5, 31.0],
+            [43.3, 36.9],
+            [42.8, 36.9],
+            [42.0, 31.5],
+            [30.4, 33.5]
+          ]
+        }
+      },
+      "tick_period": "1.0"
+    }
+  },
+  "websight": {
+    "WebsightServer": {
+      "webroot": "packages/sight/webroot",
+      "assetroot": "../isaac_assets",
+      "port": 3000,
+      "ui_config": {
+        "windows": {
+          "flatsim - 3D View": {
+            "renderer": "3d",
+            "dims": {
+              "width":640,
+              "height":480
+            },
+            "channels": [
+              { "name": "flatsim/map/occupancy/map" },
+              {
+                "name": "flatsim/local_map/isaac.navigation.LocalMap/local_map",
+                "active": false
+              },
+              { "name": "flatsim/global_plan/isaac.planner.GlobalPlanner/target" },
+              { "name": "flatsim/global_plan/isaac.planner.GlobalPlanner/path" },
+              { "name": "flatsim/lqr/isaac.planner.DifferentialBaseLqrPlanner/plan" },
+              {
+                "name": "flatsim/global_plan/isaac.planner.GlobalPlanner/graph",
+                "active": false
+              },
+              { "name": "flatsim/scan_localization/robot_viewer/robot" },
+              {
+                "name": "flatsim/sim_range_scan/isaac.flatsim.SimRangeScan/scan",
+                "active": false
+              }
+            ]
+          },
+          "flatsim - Local View": {
+            "renderer": "2d",
+            "dims": {
+              "width":256,
+              "height":256
+            },
+            "channels": [
+              { "name": "flatsim/local_map/isaac.navigation.LocalMap/local_map" },
+              { "name": "flatsim/global_plan/isaac.planner.GlobalPlanner/target" },
+              { "name": "flatsim/global_plan/isaac.planner.GlobalPlanner/path" },
+              {
+                "name": "flatsim/scan_localization/robot_viewer/trail",
+                "active": false
+              },
+              { "name": "flatsim/scan_localization/robot_viewer/robot" },
+              { "name": "flatsim/lqr/isaac.planner.DifferentialBaseLqrPlanner/plan" }
+            ]
+          },
+          "flatsim - Map View": {
+            "renderer": "2d",
+            "dims": {
+              "width": 432,
+              "height": 548
+            },
+            "channels": [
+              { "name": "flatsim/map/occupancy/map" },
+              { "name": "flatsim/map/waypoints/waypoints" },
+              { "name": "flatsim/local_map/isaac.navigation.LocalMap/local_map" },
+              { "name": "flatsim/lqr/isaac.planner.DifferentialBaseLqrPlanner/plan" },
+              {
+                "name": "flatsim/global_plan/isaac.planner.GlobalPlanner/graph",
+                "active": false
+              },
+              {
+                "name": "flatsim/map/restricted_area/restricted_area",
+                "active": false
+              },
+              {
+                "name": "flatsim/global_localization/grid_search_localizer/error",
+                "active": false
+              },
+              { "name": "flatsim/scan_localization/flatscan_viewer/beam_lines" },
+              { "name": "flatsim/scan_localization/flatscan_viewer/beam_endpoints" },
+              { "name": "flatsim/global_plan/isaac.planner.GlobalPlanner/target" },
+              { "name": "flatsim/global_plan/isaac.planner.GlobalPlanner/path" },
+              {
+                "name": "flatsim/scan_localization/isaac.navigation.ParticleFilterLocalization/particles",
+                "active": false
+              },
+              { "name": "flatsim/scan_localization/robot_viewer/robot" }
+            ]
+          },
+          "flatsim - Speed profile": {
+            "renderer": "plot",
+            "dims": {
+              "width":640,
+              "height":480
+            },
+            "channels": [
+              { "name": "flatsim/control/isaac.planner.DifferentialBaseControl/controller.commanded_linear_speed"},
+              { "name": "flatsim/control/isaac.planner.DifferentialBaseControl/controller.desired_linear_speed"},
+              { "name": "flatsim/segway_odometry/isaac.navigation.DifferentialBaseOdometry/dynamics.estimated_speed"},
+              { "name": "flatsim/segway_odometry/isaac.navigation.DifferentialBaseOdometry/dynamics.observed_speed" }
+            ]
+          }
+        },
+        "assets": {
+          "carter": {
+            "obj": "apps/assets/carter.obj",
+            "diffuse_map": "apps/assets/carter_albido.png",
+            "normal_map": "apps/assets/carter_normal.png",
+            "rotation": [-0.5, -0.5, 0.5, 0.5],
+            "scale": 0.01
+          }
+        }
+      }
+    }
+  }
+}

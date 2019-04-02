@@ -1,0 +1,972 @@
+{
+  "config": {
+    "base_simulation": {
+      "isaac.flatsim.DifferentialBasePhysics": {
+        "tick_period": "100Hz"
+      },
+      "isaac.flatsim.DifferentialBaseSimulator": {
+        "control_robot": true,
+        "tick_period": "100Hz"
+      }
+    },
+    "control": {
+      "isaac.planner.DifferentialBaseControl": {
+        "tick_period": "100Hz",
+        "use_tick_time": true
+      }
+    },
+    "global_localization": {
+      "grid_search_localizer": {
+        "tick_period": "250ms"
+      }
+    },
+    "global_plan": {
+      "isaac.navigation.OccupancyToBinaryMap": {
+        "is_optimistic": true,
+        "mean_threshold": 196,
+        "stdandard_deviation_threshold": 64
+      },
+      "isaac.navigation.BinaryToDistanceMap": {
+        "local_map_name": "global_plan_local_map",
+        "compute_distance_inside": false,
+        "blur_factor": 0,
+        "max_distance": 2.0
+      },
+      "isaac.planner.GlobalPlanner": {
+        "local_map_name": "global_plan_local_map",
+        "tick_period": "1Hz"
+      }
+    },
+    "go_to": {
+      "isaac.navigation.GoTo": {
+        "tick_period": "100ms",
+        "var_rx_delta_pos": "global_plan/isaac.planner.GlobalPlanner/delta_p",
+        "var_rx_delta_rot": "global_plan/isaac.planner.GlobalPlanner/delta_q",
+        "var_rx_speed_pos": "segway_odometry/isaac.navigation.DifferentialBaseOdometry/speed_p",
+        "var_rx_speed_rot": "segway_odometry/isaac.navigation.DifferentialBaseOdometry/speed_q"
+      }
+    },
+    "goal_behavior": {
+      "isaac.alice.Behavior": {
+        "aliases": [
+          "random",
+          "waypoint",
+          "pose",
+          "patrol"
+        ],
+        "nodes": [
+          "random_walk",
+          "waypoint_as_goal",
+          "pose_as_goal",
+          "patrol"
+        ]
+      },
+      "isaac.navigation.SelectorBehavior": {
+        "desired_behavior": "random",
+        "tick_period": "50ms"
+      }
+    },
+    "localization_evaluation": {
+      "isaac.navigation.LocalizationEvaluation": {
+        "tick_period": "20Hz"
+      }
+    },
+    "localize": {
+      "isaac.alice.Behavior": {
+        "aliases": [
+          "global_loc",
+          "local_loc",
+          "navigate"
+        ],
+        "nodes": [
+          "global_localization",
+          "scan_localization",
+          "global_plan"
+        ]
+      },
+      "isaac.navigation.LocalizeBehavior": {
+        "tick_period": "50ms"
+      }
+    },
+    "local_map": {
+      "isaac.navigation.OccupancyToBinaryMap": {
+        "mean_threshold": 32,
+        "stdandard_deviation_threshold": 0
+      },
+      "isaac.navigation.BinaryToDistanceMap": {
+        "local_map_name": "local_map",
+        "compute_distance_inside": true,
+        "blur_factor": 3,
+        "max_distance": 5.0
+      }
+    },
+    "lqr": {
+      "isaac.planner.DifferentialBaseLqrPlanner": {
+        "max_speed": 0.65,
+        "num_controls": 50,
+        "local_maps": ["local_map"],
+        "tick_period": "10Hz"
+      }
+    },
+    "patrol": {
+      "isaac.navigation.Patrol": {
+        "tick_period": "250ms",
+        "var_rx_has_arrived": "go_to/isaac.navigation.GoTo/has_arrived",
+        "var_rx_is_stationary": "go_to/isaac.navigation.GoTo/is_stationary"
+      }
+    },
+    "pose_as_goal": {
+      "isaac.navigation.PoseAsGoal": {
+        "goal_frame": "pose_as_goal",
+        "tick_period": "250ms"
+      },
+      "pose_as_goal_frame": {
+        "attach_interactive_marker": true,
+        "lhs_frame": "world",
+        "pose": [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          10.0,
+          10.0,
+          0.0
+        ],
+        "rhs_frame": "pose_as_goal"
+      }
+    },
+    "random_walk": {
+      "isaac.navigation.RandomWalk": {
+        "robot_radius": 0.5,
+        "tick_period": "250ms",
+        "timeout": 10.0,
+        "var_rx_has_arrived": "go_to/isaac.navigation.GoTo/has_arrived",
+        "var_rx_is_stationary": "go_to/isaac.navigation.GoTo/is_stationary"
+      }
+    },
+    "range_scan_flattening": {
+      "isaac.perception.RangeScanFlattening": {
+        "min_count": 900
+      }
+    },
+    "robot_pose_initializer": {
+      "initial_pose": {
+        "attach_interactive_marker": true,
+        "lhs_frame": "world",
+        "pose": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          25.0,
+          20.0,
+          0.0
+        ],
+        "rhs_frame": "robot_init"
+      }
+    },
+    "scan_localization": {
+      "robot_viewer": {
+        "tick_period": "50Hz"
+      }
+    },
+    "segway_odometry": {
+      "isaac.navigation.DifferentialBaseOdometry": {
+        "tick_period": "100Hz"
+      }
+    },
+    "sim_range_scan": {
+      "isaac.flatsim.SimRangeScan": {
+        "beam_invalid_probability": 0.1,
+        "beam_random_probability": 0.0,
+        "beam_short_probability": 0.05,
+        "num_beams": 900,
+        "range_sigma_abs": 0.05,
+        "range_sigma_rel": 0.005,
+        "tick_period": "50ms"
+      },
+      "lidar_initializer": {
+        "lhs_frame": "robot",
+        "pose": [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          -0.04,
+          0.0,
+          0.0
+        ],
+        "rhs_frame": "lidar"
+      }
+    },
+    "waypoint_as_goal": {
+      "isaac.navigation.MapWaypointAsGoal": {
+        "map_layer": "map/waypoints",
+        "tick_period": "250ms"
+      }
+    },
+    "websight": {
+      "WebsightServer": {
+        "port": 3000,
+        "ui_config": {
+          "assets": {
+            "carter": {
+              "diffuse_map": "assets/carter_albido.png",
+              "normal_map": "assets/carter_normal.png",
+              "obj": "assets/carter.obj",
+              "rotation": [
+                -0.5,
+                -0.5,
+                0.5,
+                0.5
+              ],
+              "scale": 0.01
+            }
+          },
+          "windows": {
+            "flatsim - 3D View": {
+              "channels": [
+                {
+                  "name": "flatsim/map/occupancy/map"
+                },
+                {
+                  "active": false,
+                  "name": "flatsim/local_map/isaac.navigation.LocalMap/local_map"
+                },
+                {
+                  "name": "flatsim/global_plan/isaac.planner.GlobalPlanner/target"
+                },
+                {
+                  "name": "flatsim/global_plan/isaac.planner.GlobalPlanner/path"
+                },
+                {
+                  "name": "flatsim/lqr/isaac.planner.DifferentialBaseLqrPlanner/plan"
+                },
+                {
+                  "active": false,
+                  "name": "flatsim/global_plan/isaac.planner.GlobalPlanner/graph"
+                },
+                {
+                  "name": "flatsim/scan_localization/robot_viewer/robot"
+                },
+                {
+                  "active": false,
+                  "name": "flatsim/sim_range_scan/isaac.flatsim.SimRangeScan/scan"
+                }
+              ],
+              "dims": {
+                "height": 480,
+                "width": 640
+              },
+              "renderer": "3d"
+            },
+            "flatsim - Local View": {
+              "channels": [
+                {
+                  "name": "flatsim/local_map/isaac.navigation.LocalMap/local_map"
+                },
+                {
+                  "name": "flatsim/global_plan/isaac.planner.GlobalPlanner/target"
+                },
+                {
+                  "name": "flatsim/global_plan/isaac.planner.GlobalPlanner/path"
+                },
+                {
+                  "active": false,
+                  "name": "flatsim/scan_localization/robot_viewer/trail"
+                },
+                {
+                  "name": "flatsim/scan_localization/robot_viewer/robot"
+                },
+                {
+                  "name": "flatsim/lqr/isaac.planner.DifferentialBaseLqrPlanner/plan"
+                }
+              ],
+              "dims": {
+                "height": 256,
+                "width": 256
+              },
+              "renderer": "2d"
+            },
+            "flatsim - Map View": {
+              "channels": [
+                {
+                  "name": "flatsim/map/occupancy/map"
+                },
+                {
+                  "name": "flatsim/map/waypoints/waypoints"
+                },
+                {
+                  "name": "flatsim/local_map/isaac.navigation.LocalMap/local_map"
+                },
+                {
+                  "name": "flatsim/lqr/isaac.planner.LqrPlanner/plan"
+                },
+                {
+                  "active": false,
+                  "name": "flatsim/global_plan/isaac.planner.GlobalPlanner/graph"
+                },
+                {
+                  "active": false,
+                  "name": "flatsim/map/restricted_area/restricted_area"
+                },
+                {
+                  "active": false,
+                  "name": "flatsim/global_localization/grid_search_localizer/error"
+                },
+                {
+                  "name": "flatsim/scan_localization/flatscan_viewer/beam_lines"
+                },
+                {
+                  "name": "flatsim/scan_localization/flatscan_viewer/beam_endpoints"
+                },
+                {
+                  "name": "flatsim/global_plan/isaac.planner.GlobalPlanner/target"
+                },
+                {
+                  "name": "flatsim/global_plan/isaac.planner.GlobalPlanner/path"
+                },
+                {
+                  "active": false,
+                  "name": "flatsim/scan_localization/isaac.navigation.ParticleFilterLocalization/particles"
+                },
+                {
+                  "name": "flatsim/scan_localization/robot_viewer/robot"
+                }
+              ],
+              "dims": {
+                "height": 548,
+                "width": 432
+              },
+              "renderer": "2d"
+            },
+            "flatsim - Speed profile": {
+              "channels": [
+                {
+                  "name": "flatsim/control/isaac.planner.DifferentialBaseControl/controller.commanded_linear_speed"
+                },
+                {
+                  "name": "flatsim/control/isaac.planner.DifferentialBaseControl/controller.desired_linear_speed"
+                },
+                {
+                  "name": "flatsim/segway_odometry/isaac.navigation.DifferentialBaseOdometry/dynamics.estimated_speed"
+                },
+                {
+                  "name": "flatsim/segway_odometry/isaac.navigation.DifferentialBaseOdometry/dynamics.observed_speed"
+                }
+              ],
+              "dims": {
+                "height": 480,
+                "width": 640
+              },
+              "renderer": "plot"
+            }
+          }
+        },
+        "webroot": "packages/sight/webroot"
+      }
+    }
+  },
+  "graph": {
+    "edges": [
+      {
+        "source": "go_to/isaac.navigation.GoTo/goal_out",
+        "target": "global_plan/isaac.planner.GlobalPlanner/goal"
+      },
+      {
+        "source": "random_walk/isaac.navigation.RandomWalk/goal",
+        "target": "go_to/isaac.navigation.GoTo/goal_in"
+      },
+      {
+        "source": "go_to/isaac.navigation.GoTo/feedback",
+        "target": "random_walk/isaac.navigation.RandomWalk/feedback"
+      },
+      {
+        "source": "waypoint_as_goal/isaac.navigation.MapWaypointAsGoal/goal",
+        "target": "go_to/isaac.navigation.GoTo/goal_in"
+      },
+      {
+        "source": "pose_as_goal/isaac.navigation.PoseAsGoal/goal",
+        "target": "go_to/isaac.navigation.GoTo/goal_in"
+      },
+      {
+        "source": "patrol/isaac.navigation.Patrol/goal",
+        "target": "go_to/isaac.navigation.GoTo/goal_in"
+      },
+      {
+        "source": "segway_odometry/isaac.navigation.DifferentialBaseOdometry/odometry",
+        "target": "lqr/isaac.planner.DifferentialBaseLqrPlanner/odometry"
+      },
+      {
+        "source": "local_map/isaac.navigation.LocalMap/local_map",
+        "target": "local_map/isaac.navigation.OccupancyToBinaryMap/occupancy_map"
+      },
+      {
+        "source": "local_map/isaac.navigation.OccupancyToBinaryMap/binary_map",
+        "target": "local_map/isaac.navigation.BinaryToDistanceMap/binary_map"
+      },
+      {
+        "source": "local_map/isaac.navigation.LocalMap/local_map",
+        "target": "global_plan/isaac.navigation.OccupancyToBinaryMap/occupancy_map"
+      },
+      {
+        "source": "global_plan/isaac.navigation.OccupancyToBinaryMap/binary_map",
+        "target": "global_plan/isaac.navigation.BinaryToDistanceMap/binary_map"
+      },
+      {
+        "source": "lqr/isaac.planner.DifferentialBaseLqrPlanner/plan",
+        "target": "control/isaac.planner.DifferentialBaseControl/plan"
+      },
+      {
+        "source": "global_plan/isaac.planner.GlobalPlanner/plan",
+        "target": "lqr/isaac.planner.DifferentialBaseLqrPlanner/global_plan"
+      },
+      {
+        "source": "local_map/isaac.navigation.LocalMap/local_map",
+        "target": "global_plan/isaac.planner.GlobalPlanner/local_map"
+      },
+      {
+        "source": "local_map/isaac.navigation.LocalMap/local_map",
+        "target": "lqr/isaac.planner.DifferentialBaseLqrPlanner/local_map"
+      },
+      {
+        "source": "sim_range_scan/isaac.flatsim.SimRangeScan/flatscan",
+        "target": "global_localization/grid_search_localizer/flatscan"
+      },
+      {
+        "source": "sim_range_scan/isaac.flatsim.SimRangeScan/flatscan",
+        "target": "local_map/isaac.navigation.LocalMap/flatscan"
+      },
+      {
+        "source": "sim_range_scan/isaac.flatsim.SimRangeScan/flatscan",
+        "target": "scan_localization/isaac.navigation.ParticleFilterLocalization/flatscan"
+      },
+      {
+        "source": "sim_range_scan/isaac.flatsim.SimRangeScan/flatscan",
+        "target": "scan_localization/flatscan_viewer/flatscan"
+      },
+      {
+        "source": "base_simulation/isaac.flatsim.DifferentialBaseSimulator/diff_base_state",
+        "target": "segway_odometry/isaac.navigation.DifferentialBaseOdometry/state"
+      },
+      {
+        "source": "control/isaac.planner.DifferentialBaseControl/cmd",
+        "target": "base_simulation/isaac.flatsim.DifferentialBaseSimulator/diff_base_command"
+      },
+      {
+        "source": "base_simulation/isaac.flatsim.DifferentialBaseSimulator/physics_actuation",
+        "target": "base_simulation/isaac.flatsim.DifferentialBasePhysics/command"
+      },
+      {
+        "source": "base_simulation/isaac.flatsim.DifferentialBasePhysics/bodies",
+        "target": "base_simulation/isaac.flatsim.DifferentialBaseSimulator/physics_bodies"
+      }
+    ],
+    "nodes": [
+      {
+        "components": [
+          {
+            "name": "obstacle_world",
+            "type": "isaac::navigation::ObstacleWorld"
+          }
+        ],
+        "name": "obstacle_world"
+      },
+      {
+        "components": [
+          {
+            "name": "isaac.flatsim.DifferentialBasePhysics",
+            "type": "isaac::flatsim::DifferentialBasePhysics"
+          },
+          {
+            "name": "isaac.flatsim.DifferentialBaseSimulator",
+            "type": "isaac::flatsim::DifferentialBaseSimulator"
+          },
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          }
+        ],
+        "gui": {
+          "position": [
+            1582.0,
+            656.0
+          ],
+          "size": [
+            314.0,
+            256.0
+          ]
+        },
+        "name": "base_simulation"
+      },
+      {
+        "components": [
+          {
+            "name": "isaac.planner.DifferentialBaseControl",
+            "type": "isaac::planner::DifferentialBaseControl"
+          },
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          }
+        ],
+        "gui": {
+          "position": [
+            1166.0,
+            688.0
+          ],
+          "size": [
+            304.0,
+            160.0
+          ]
+        },
+        "name": "control"
+      },
+      {
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          }
+        ],
+        "gui": {
+          "position": [
+            -769.0,
+            1259.0
+          ],
+          "size": [
+            186.0,
+            88.0
+          ]
+        },
+        "name": "db"
+      },
+      {
+        "components": [
+          {
+            "name": "grid_search_localizer",
+            "type": "isaac::navigation::GridSearchLocalizer"
+          },
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          }
+        ],
+        "gui": {
+          "position": [
+            388.0,
+            192.0
+          ],
+          "size": [
+            200.0,
+            136.0
+          ]
+        },
+        "disable_automatic_start": true,
+        "name": "global_localization"
+      },
+      {
+        "components": [
+          {
+            "name": "isaac.planner.GlobalPlanner",
+            "type": "isaac::planner::GlobalPlanner"
+          },
+          {
+            "name": "isaac.navigation.OccupancyToBinaryMap",
+            "type": "isaac::navigation::OccupancyToBinaryMap"
+          },
+          {
+            "name": "isaac.navigation.BinaryToDistanceMap",
+            "type": "isaac::navigation::BinaryToDistanceMap"
+          },
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          }
+        ],
+        "gui": {
+          "position": [
+            404.0,
+            628.0
+          ],
+          "size": [
+            233.0,
+            184.0
+          ]
+        },
+        "name": "global_plan"
+      },
+      {
+        "components": [
+          {
+            "name": "isaac.navigation.GoTo",
+            "type": "isaac::navigation::GoTo"
+          },
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          }
+        ],
+        "gui": {
+          "position": [
+            -203.0,
+            486.0
+          ],
+          "size": [
+            200.0,
+            184.0
+          ]
+        },
+        "name": "go_to"
+      },
+      {
+        "components": [
+          {
+            "name": "isaac.navigation.LocalMap",
+            "type": "isaac::navigation::LocalMap"
+          },
+          {
+            "name": "isaac.navigation.OccupancyToBinaryMap",
+            "type": "isaac::navigation::OccupancyToBinaryMap"
+          },
+          {
+            "name": "isaac.navigation.BinaryToDistanceMap",
+            "type": "isaac::navigation::BinaryToDistanceMap"
+          },
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          }
+        ],
+        "gui": {
+          "position": [
+            92.0,
+            347.0
+          ],
+          "size": [
+            217.0,
+            136.0
+          ]
+        },
+        "name": "local_map"
+      },
+      {
+        "components": [
+          {
+            "name": "isaac.navigation.LocalizationEvaluation",
+            "type": "isaac::navigation::LocalizationEvaluation"
+          }
+        ],
+        "gui": {
+          "position": [
+            -553.0,
+            1267.0
+          ],
+          "size": [
+            315.0,
+            64.0
+          ]
+        },
+        "name": "localization_evaluation"
+      },
+      {
+        "components": [
+          {
+            "name": "isaac.planner.DifferentialBaseLqrPlanner",
+            "type": "isaac::planner::DifferentialBaseLqrPlanner"
+          },
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          }
+        ],
+        "gui": {
+          "position": [
+            760.0,
+            614.0
+          ],
+          "size": [
+            332.0,
+            208.0
+          ]
+        },
+        "name": "lqr"
+      },
+      {
+        "components": [
+          {
+            "name": "isaac.navigation.Patrol",
+            "type": "isaac::navigation::Patrol"
+          },
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          }
+        ],
+        "gui": {
+          "position": [
+            -605.0,
+            697.0
+          ],
+          "size": [
+            200.0,
+            136.0
+          ]
+        },
+        "name": "patrol"
+      },
+      {
+        "components": [
+          {
+            "name": "isaac.navigation.PoseAsGoal",
+            "type": "isaac::navigation::PoseAsGoal"
+          },
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "pose_as_goal_frame",
+            "type": "isaac::alice::PoseInitializer"
+          }
+        ],
+        "gui": {
+          "position": [
+            -634.0,
+            320.0
+          ],
+          "size": [
+            234.0,
+            136.0
+          ]
+        },
+        "name": "pose_as_goal"
+      },
+      {
+        "components": [
+          {
+            "name": "isaac.navigation.RandomWalk",
+            "type": "isaac::navigation::RandomWalk"
+          },
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          }
+        ],
+        "gui": {
+          "position": [
+            -192.0,
+            780.0
+          ],
+          "size": [
+            245.0,
+            160.0
+          ]
+        },
+        "name": "random_walk"
+      },
+      {
+        "components": [
+          {
+            "name": "initial_pose",
+            "type": "isaac::alice::PoseInitializer"
+          }
+        ],
+        "gui": {
+          "position": [
+            -192.0,
+            -3.0
+          ],
+          "size": [
+            180.0,
+            64.0
+          ]
+        },
+        "start_order": -200,
+        "name": "robot_pose_initializer"
+      },
+      {
+        "components": [
+          {
+            "name": "flatscan_viewer",
+            "type": "isaac::navigation::FlatscanViewer"
+          },
+          {
+            "name": "isaac.navigation.ParticleFilterLocalization",
+            "type": "isaac::navigation::ParticleFilterLocalization"
+          },
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "robot_viewer",
+            "type": "isaac::navigation::RobotViewer"
+          }
+        ],
+        "gui": {
+          "position": [
+            285.0,
+            -88.0
+          ],
+          "size": [
+            332.0,
+            208.0
+          ]
+        },
+        "disable_automatic_start": true,
+        "name": "scan_localization"
+      },
+      {
+        "components": [
+          {
+            "name": "isaac.navigation.DifferentialBaseOdometry",
+            "type": "isaac::navigation::DifferentialBaseOdometry"
+          },
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          }
+        ],
+        "gui": {
+          "position": [
+            759.0,
+            1111.0
+          ],
+          "size": [
+            345.0,
+            160.0
+          ]
+        },
+        "name": "segway_odometry"
+      },
+      {
+        "components": [
+          {
+            "name": "DifferentialBaseModel",
+            "type": "isaac::planner::DifferentialBaseModel"
+          },
+          {
+            "name": "RangeScanModel",
+            "type": "isaac::navigation::RangeScanModelFlatloc"
+          }
+        ],
+        "gui": {
+          "position": [
+            -552.0,
+            1123.0
+          ],
+          "size": [
+            187.0,
+            88.0
+          ]
+        },
+        "name": "shared_robot_model"
+      },
+      {
+        "components": [
+          {
+            "name": "isaac.flatsim.SimRangeScan",
+            "type": "isaac::flatsim::SimRangeScan"
+          },
+          {
+            "name": "lidar_initializer",
+            "type": "isaac::alice::PoseInitializer"
+          },
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          }
+        ],
+        "gui": {
+          "position": [
+            -216.0,
+            121.0
+          ],
+          "size": [
+            228.0,
+            136.0
+          ]
+        },
+        "name": "sim_range_scan"
+      },
+      {
+        "components": [
+          {
+            "name": "isaac.navigation.MapWaypointAsGoal",
+            "type": "isaac::navigation::MapWaypointAsGoal"
+          },
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          }
+        ],
+        "gui": {
+          "position": [
+            -703.0,
+            504.0
+          ],
+          "size": [
+            304.0,
+            136.0
+          ]
+        },
+        "name": "waypoint_as_goal"
+      },
+      {
+        "components": [
+          {
+            "name": "isaac.alice.Behavior",
+            "type": "isaac::alice::Behavior"
+          },
+          {
+            "name": "isaac.navigation.LocalizeBehavior",
+            "type": "isaac::navigation::LocalizeBehavior"
+          }
+        ],
+        "gui": {
+          "position": [
+            -191.0,
+            -156.0
+          ],
+          "size": [
+            273.0,
+            112.0
+          ]
+        },
+        "name": "localize"
+      },
+      {
+        "components": [
+          {
+            "name": "isaac.alice.Behavior",
+            "type": "isaac::alice::Behavior"
+          },
+          {
+            "name": "isaac.navigation.SelectorBehavior",
+            "type": "isaac::navigation::SelectorBehavior"
+          }
+        ],
+        "gui": {
+          "position": [
+            -681.0,
+            169.0
+          ],
+          "size": [
+            274.0,
+            88.0
+          ]
+        },
+        "start_order": 1,
+        "name": "goal_behavior"
+      }
+    ]
+  },
+  "modules": [
+    "flatsim",
+    "map",
+    "navigation",
+    "planner"
+  ],
+  "name": "flatsim"
+}

@@ -1,0 +1,171 @@
+{
+  "name": "logmapping",
+  "modules": [
+    "navigation",
+    "navigation:cartographer"
+  ],
+  "graph": {
+    "nodes": [
+      {
+        "name": "lidar_pose",
+        "start_order": -200,
+        "components": [
+          {
+            "name": "initial_pose",
+            "type": "isaac::alice::PoseInitializer"
+          }
+        ]
+      },
+      {
+        "name": "replay",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "isaac.alice.Replay",
+            "type": "isaac::alice::Replay"
+          }
+        ]
+      },
+      {
+        "name": "segway_odometry",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "isaac.navigation.DifferentialBaseOdometry",
+            "type": "isaac::navigation::DifferentialBaseOdometry"
+          }
+        ]
+      },
+      {
+        "name": "gmapping",
+        "components": [
+          {
+            "name": "ml",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "navigation.GMappingNode",
+            "type": "navigation::GMappingNode"
+          }
+        ]
+      },
+      {
+        "name": "cartographer",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "isaac.navigation.Cartographer",
+            "type": "isaac::navigation::Cartographer"
+          }
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "source": "replay/isaac.alice.Replay/flatscan",
+        "target": "gmapping/navigation.GMappingNode/flatscan"
+      },
+      {
+        "source": "replay/isaac.alice.Replay/flatscan",
+        "target": "cartographer/isaac.navigation.Cartographer/flatscan"
+      },
+      {
+        "source": "replay/isaac.alice.Replay/segway_state",
+        "target": "segway_odometry/isaac.navigation.DifferentialBaseOdometry/state"
+      }
+    ]
+  },
+  "config": {
+    "lidar_pose": {
+      "initial_pose": {
+        "lhs_frame": "robot",
+        "rhs_frame": "lidar",
+        "pose": [1.0, 0.0, 0.0, 0.0, -0.04, 0.0, 0.59]
+      }
+    },
+    "replay": {
+      "isaac.alice.Replay": {
+        "cask_directory": "PATH/TO/LOGFILE",
+        "replay_time_offset": 0
+      }
+    },
+    "cartographer": {
+      "isaac.navigation.Cartographer": {
+        "lua_configuration_directory": "../com_github_googlecartographer_cartographer/configuration_files/,apps/carter/logmapping/",
+        "lua_configuration_basename": "carter.lua",
+        "background_size": [3000, 3000],
+        "background_translation": [-150.0, -150.0],
+        "tick_dt": 0.25,
+        "num_visible_submaps": 100,
+        "tick_period": "250ms"
+      }
+    },
+    "segway_odometry": {
+      "isaac.navigation.DifferentialBaseOdometry": {
+        "tick_period": "100Hz"
+      }
+    },
+    "websight": {
+      "WebsightServer": {
+        "webroot": "packages/sight/webroot",
+        "assetroot": "../isaac_assets",
+        "port": 3000,
+        "ui_config": {
+          "windows": {
+            "logmapping - gmapping": {
+              "renderer": "2d",
+              "dims": {
+                "width": 600,
+                "height": 600
+              },
+              "channels": [
+                {
+                  "name": "logmapping/gmapping/navigation.GMappingNode/global_map",
+                  "active": true
+                },
+                {
+                  "name": "logmapping/gmapping/navigation.GMappingNode/fov_cone",
+                  "active": true
+                },
+                {
+                  "name": "logmapping/gmapping/navigation.GMappingNode/robot_pos",
+                  "active": true
+                }
+              ]
+            },
+            "logmapping - Cartographer": {
+              "renderer": "2d",
+              "dims": {
+                "width": 3000,
+                "height": 3000
+              },
+              "channels": [
+                {
+                  "name": "logmapping/cartographer/isaac.navigation.Cartographer/map_background",
+                  "active": true
+                },
+                {
+                  "name": "logmapping/cartographer/isaac.navigation.Cartographer/submaps",
+                  "active": true
+                },
+                {
+                  "name": "logmapping/cartographer/isaac.navigation.Cartographer/trajectory_node",
+                  "active": true
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

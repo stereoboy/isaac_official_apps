@@ -1,0 +1,100 @@
+{
+  "name": "april_tags",
+  "modules": [
+    "//packages/perception:april_tags",
+    "realsense",
+    "viewers"
+  ],
+  "graph": {
+    "nodes": [
+      {
+        "name": "input_images",
+        "components": [
+          {
+            "name": "isaac.alice.MessageLedger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "isaac.RealsenseCamera",
+            "type": "isaac::RealsenseCamera"
+          }
+        ]
+      },
+      {
+        "name": "april_tags_detection",
+        "components": [
+          {
+            "name": "isaac.alice.MessageLedger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "isaac.perception.AprilTagsDetection",
+            "type": "isaac::perception::AprilTagsDetection"
+          }
+        ]
+      },
+      {
+        "name": "image_viewers",
+        "components": [
+          {
+            "name": "isaac.alice.MessageLedger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "isaac.viewers.ColorCameraViewer",
+            "type": "isaac::viewers::ColorCameraViewer"
+          }
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "source": "input_images/isaac.RealsenseCamera/color",
+        "target": "april_tags_detection/isaac.perception.AprilTagsDetection/image"
+      },
+      {
+        "source": "input_images/isaac.RealsenseCamera/color",
+        "target": "image_viewers/isaac.viewers.ColorCameraViewer/color_listener"
+      }
+    ]
+  },
+  "config": {
+    "april_tags_detection": {
+      "isaac.perception.AprilTagsDetection": {
+        "max_tags": 50
+      }
+    },
+    "input_images": {
+      "isaac.RealsenseCamera": {
+        "enable_depth": false,
+        "color_size": [540, 960],
+        "color_fps": 60
+      }
+    },
+    "websight": {
+      "WebsightServer": {
+        "webroot": "packages/sight/webroot",
+        "assetroot": "../isaac_assets",
+        "port": 3000,
+        "ui_config": {
+          "windows": {
+            "Tags": {
+              "renderer": "2d",
+              "channels": [
+                {
+                  "name": "april_tags/image_viewers/isaac.viewers.ColorCameraViewer/Color"
+                },
+                {
+                  "name": "april_tags/april_tags_detection/isaac.perception.AprilTagsDetection/tag_fill"
+                },
+                {
+                  "name": "april_tags/april_tags_detection/isaac.perception.AprilTagsDetection/tag_boundary"
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

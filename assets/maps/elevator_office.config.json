@@ -1,0 +1,30 @@
+{
+  "map": {
+    "map": {
+      "num_floors": 2
+    },
+    "occupancy_0": {
+      "cell_size": 0.075,
+      "filename": "apps/assets/maps/elevator_office_1.png"
+    },
+    "waypoints_0": {
+      "vis_cell_size": 0.075,
+      "waypoints": {
+      },
+      "tick_period": "1.0"
+    },
+    "occupancy_1": {
+      "cell_size": 0.075,
+      "filename": "apps/assets/maps/elevator_office_2.png"
+    },
+    "waypoints_1": {
+        "tick_period": "1.0"
+    },
+    "restricted_area_0": {
+      "tick_period": "1.0"
+    },
+    "restricted_area_1": {
+      "tick_period": "1.0"
+    }
+  }
+}

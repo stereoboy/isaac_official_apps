@@ -1,0 +1,241 @@
+{
+  "name": "object_detection",
+  "modules": [
+    "kaya_base",
+    "ml",
+    "navigation",
+    "realsense",
+    "sensors:joystick",
+    "viewers",
+    "yolo"
+  ],
+  "config_files": [
+    "apps/kaya/robots/kaya_v2.config.json"
+  ],
+  "config": {
+    "joystick": {
+      "isaac.Joystick": {
+        "tick_period": "50ms"
+      }
+    },
+    "holonomic_joystick": {
+      "isaac.alice.FailsafeHeartbeat": {
+        "interval": 0.25,
+        "failsafe_name": "Kaya_failsafe",
+        "heartbeat_name": "deadman_switch"
+      },
+      "isaac.navigation.RobotRemoteControl": {
+        "tick_period": "10ms",
+        "differential_joystick": false,
+        "linear_speed_max": 0.75,
+        "angular_speed_max": 3.0
+      }
+    },
+    "kaya_odometry": {
+      "isaac.navigation.HolonomicBaseWheelImuOdometry": {
+        "tick_period": "100Hz",
+        "use_imu": false
+      }
+    },
+    "kaya_driver": {
+      "isaac.KayaBaseDriver": {
+        "tick_period": "100ms",
+        "max_safe_speed": 0.75,
+        "max_angular_speed": 3.0,
+        "baudrate": "1000000"
+      },
+      "isaac.alice.Failsafe": {
+        "name": "Kaya_failsafe"
+      }
+    },
+    "camera": {
+      "realsense": {
+        "rows": 480,
+        "cols": 848,
+        "framerate": 30
+      }
+    },
+    "detector": {
+      "isaac.yolo.YoloTensorRTInference": {
+        "yolo_config_json": {
+          "yolo_dimensions": [ 416, 416 ],
+          "batch_size": 1,
+          "weights_file_path": "./external/yolo_tensorrt_test_data_gtc2019_demo/gtc_demo.weights",
+          "config_file_path": "./external/yolo_tensorrt_test_data_gtc2019_demo/yolov3-tiny_synthetic_gtc.cfg",
+          "tensorrt_folder_path": "/tmp/",
+          "num_classes": 3,
+          "network_type": "yolov3-tiny"
+        }
+      },
+      "isaac.alice.Throttle": {
+        "data_channel": "input",
+        "output_channel": "output",
+        "minimum_interval": 0.2,
+        "use_signal_channel": false
+      },
+      "isaac.ml.DetectionDecoder": {
+        "labels_file_path" : "./external/yolo_tensorrt_test_data_gtc2019_demo/labels_demo.txt",
+        "nms_threshold" : 0.6,
+        "confidence_threshold" : 0.6
+      }
+    },
+    "websight": {
+      "WebsightServer": {
+        "webroot": "packages/sight/webroot",
+        "assetroot": "../isaac-lfs/sight/assets",
+        "port": 3000,
+        "ui_config": {
+          "windows": {
+            "Detector Kaya - Objects": {
+              "renderer": "2d",
+              "channels": [
+                {
+                  "name": "object_detection/detector/isaac.yolo.YoloTensorRTInference/image"
+                },
+                {
+                  "name": "object_detection/detector/isaac.viewers.DetectionsViewer/detections"
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "graph": {
+    "nodes": [
+      {
+        "name": "kaya_odometry",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "isaac.navigation.HolonomicBaseWheelImuOdometry",
+            "type": "isaac::navigation::HolonomicBaseWheelImuOdometry"
+          }
+        ]
+      },
+      {
+        "name": "joystick",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "isaac.Joystick",
+            "type": "isaac::Joystick"
+          }
+        ]
+      },
+      {
+        "name": "kaya_driver",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "isaac.KayaBaseDriver",
+            "type": "isaac::KayaBaseDriver"
+          },
+          {
+            "name": "isaac.alice.Failsafe",
+            "type": "isaac::alice::Failsafe"
+          }
+        ]
+      },
+      {
+        "name": "holonomic_joystick",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "isaac.navigation.RobotRemoteControl",
+            "type": "isaac::navigation::RobotRemoteControl"
+          },
+          {
+            "name": "isaac.alice.FailsafeHeartbeat",
+            "type": "isaac::alice::FailsafeHeartbeat"
+          }
+        ]
+      },
+      {
+        "name": "camera",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "realsense_pose",
+            "type": "isaac::alice::PoseInitializer"
+          },
+          {
+            "name": "realsense",
+            "type": "isaac::RealsenseCameraSimple"
+          }
+        ]
+      },
+      {
+        "name": "detector",
+        "components": [
+          {
+            "name": "isaac.alice.MessageLedger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "isaac.yolo.YoloTensorRTInference",
+            "type": "isaac::yolo::YoloTensorRTInference"
+          },
+          {
+            "name": "isaac.alice.Throttle",
+            "type": "isaac::alice::Throttle"
+          },
+          {
+            "name": "isaac.viewers.DetectionsViewer",
+            "type": "isaac::viewers::DetectionsViewer"
+          },
+          {
+            "name": "isaac.ml.DetectionDecoder",
+            "type": "isaac::ml::DetectionDecoder"
+          }
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "source": "joystick/isaac.Joystick/js_state",
+        "target": "holonomic_joystick/isaac.navigation.RobotRemoteControl/js_state"
+      },
+      {
+        "source": "kaya_driver/isaac.KayaBaseDriver/state",
+        "target": "kaya_odometry/isaac.navigation.HolonomicBaseWheelImuOdometry/state"
+      },
+      {
+        "source": "holonomic_joystick/isaac.navigation.RobotRemoteControl/segway_cmd",
+        "target": "kaya_driver/isaac.KayaBaseDriver/command"
+      },
+      {
+        "source": "camera/realsense/color",
+        "target": "detector/isaac.alice.Throttle/input"
+      },
+      {
+        "source": "detector/isaac.alice.Throttle/output",
+        "target": "detector/isaac.yolo.YoloTensorRTInference/rgb_image"
+      },
+      {
+        "source": "detector/isaac.yolo.YoloTensorRTInference/output_detection_tensors",
+        "target": "detector/isaac.ml.DetectionDecoder/input_detection_tensors"
+      },
+      {
+        "source": "detector/isaac.ml.DetectionDecoder/detections",
+        "target": "detector/isaac.viewers.DetectionsViewer/detections"
+      }
+    ]
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "sim_camera": {
+    "isaac.alice.TcpSubscriber": {
+      "port": 5003,
+      "reconnect_interval": 0.5,
+      "host": "localhost"
+    }
+  },
+  "segmentation_encoder": {
+    "isaac.ml.SegmentationEncoder": {
+      "target_object_label": "Sphere"
+    }
+  },
+  "color_camera_encoder": {
+    "isaac.ml.ColorCameraEncoder": {
+      "rows": 256,
+      "cols": 512,
+      "pixel_normalization_mode": "PositiveNegative"
+    }
+  },
+  "segmentation_visualizer": {
+    "isaac.viewers.SegmentationCameraViewer": {
+      "camera_name": "segmentation"
+    }
+  },
+  "ball_navigation_training_samples": {
+    "isaac.ml.SampleAccumulator": {
+      "sample_buffer_size": 500
+    }
+  },
+  "camera_teleportation": {
+    "isaac.ml.Teleportation": {
+      "interval": 2.5,
+      "name": "carter_1",
+      "min" : [-26.30, 18.00, 0.3],
+      "max" : [5.40, 65.50, 0.3],
+      "min_yaw": 0.0,
+      "max_yaw": 6.28,
+      "min_scale": 0.01,
+      "max_scale": 0.01,
+      "enable_translation_x": true,
+      "enable_translation_y": true,
+      "enable_translation_z": true,
+      "enable_yaw": true,
+      "enable_scale": true,
+      "tick_period": "30hz"
+    }
+  },
+  "ball_teleportation": {
+    "isaac.ml.Teleportation": {
+      "name": "sphere",
+      "min" : [0.6, -1.0, -0.2],
+      "max" : [4.0, 1.0, 0.0],
+      "min_scale": 0.1,
+      "max_scale": 0.2,
+      "enable_translation_x": true,
+      "enable_translation_y": true,
+      "enable_translation_z": true,
+      "enable_scale": true,
+      "enable_on_relative_frame": true
+    }
+  },
+  "actor_group_rigid_command_publisher": {
+    "isaac.alice.TcpPublisher": {
+      "port": 5004,
+      "reconnect_interval": 0.5,
+      "host": "localhost"
+    }
+  },
+  "websight": {
+    "WebsightServer": {
+      "webroot": "packages/sight/webroot",
+      "assetroot": "../isaac_assets",
+      "port": 3000,
+      "ui_config": {
+        "windows": {
+          "Ball Segmentation - Color": {
+            "renderer": "2d",
+            "dims": {
+              "width": 512,
+              "height": 256
+            },
+            "channels": [
+              {
+                "name": "ball_segmentation_training/color_camera_visualizer/isaac.viewers.ColorCameraViewer/Color",
+                "active": true
+              }
+            ]
+          },
+          "Ball Segmentation - Segmentation": {
+            "renderer": "2d",
+            "dims": {
+              "width": 512,
+              "height": 256
+            },
+            "channels": [
+              {
+                "name": "ball_segmentation_training/segmentation_visualizer/isaac.viewers.SegmentationCameraViewer/Classes",
+                "active": true
+              }
+            ]
+          }
+        },
+        "assets": {}
+      }
+    }
+  }
+}

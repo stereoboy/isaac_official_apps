@@ -1,0 +1,43 @@
+{
+  "nodes": [
+    {
+      "name": "map",
+      "start_order": -100,
+      "components": [
+        {
+          "name": "isaac.map.Map",
+          "type": "isaac::map::Map"
+        },
+        {
+          "name": "map",
+          "type": "isaac::navigation::NavigationMap"
+        },
+        {
+          "name": "occupancy_0",
+          "type": "isaac::map::OccupancyGridMapLayer"
+        },
+        {
+          "name": "waypoints_0",
+          "type": "isaac::map::WaypointMapLayer"
+        },
+        {
+          "name": "occupancy_1",
+          "type": "isaac::map::OccupancyGridMapLayer"
+        },
+        {
+          "name": "waypoints_1",
+          "type": "isaac::map::WaypointMapLayer"
+        },
+        {
+          "name": "restricted_area_0",
+          "type": "isaac::map::PolygonMapLayer"
+        },
+        {
+          "name": "restricted_area_1",
+          "type": "isaac::map::PolygonMapLayer"
+        }
+      ]
+    }
+  ],
+  "edges": [ ]
+}

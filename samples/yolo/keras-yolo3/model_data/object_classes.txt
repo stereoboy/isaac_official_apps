@@ -1,0 +1,6 @@
+Ball
+Bowling_Pin
+Chair
+Plants
+Trashcan
+Person

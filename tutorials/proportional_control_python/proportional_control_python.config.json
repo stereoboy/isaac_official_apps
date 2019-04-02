@@ -1,0 +1,47 @@
+{
+  "segway_rmp": {
+    "isaac.SegwayRmpDriver": {
+      "ip": "192.168.0.40",
+      "tick_period": "20ms",
+      "speed_limit_angular": 1.0,
+      "speed_limit_linear": 1.0,
+      "flip_orientation": true
+    },
+    "isaac.alice.Failsafe": {
+      "name": "segway"
+    }
+  },
+  "diffbase_joystick": {
+    "isaac.alice.FailsafeHeartbeat": {
+      "interval": 0.25,
+      "failsafe_name": "segway",
+      "heartbeat_name": "deadman_switch"
+    },
+    "isaac.navigation.RobotRemoteControl": {
+      "tick_period": "10ms"
+    }
+  },
+  "odometry": {
+    "isaac.navigation.DifferentialBaseOdometry": {
+      "tick_period": "100Hz"
+    }
+  },
+  "websight": {
+    "WebsightServer": {
+      "webroot": "packages/sight/webroot",
+      "assetroot": "/home/nvidia/isaac-lfs/sight/assets",
+      "port": 3000,
+      "ui_config": {
+        "windows": {
+          "Proportional Control Python": {
+            "renderer": "plot",
+            "channels": [
+              { "name": "proportional_control_python/py_controller/isaac.alice.PyCodelet/reference (m)" },
+              { "name": "proportional_control_python/py_controller/isaac.alice.PyCodelet/position (m)" }
+            ]
+          }
+        }
+      }
+    }
+  }
+}
