@@ -42,7 +42,7 @@ isaac_app(
         "ml",
         "viewers",
         "yolo",
-        "zed",
+        "sensors:v4l2_camera",
     ],
 )
 
