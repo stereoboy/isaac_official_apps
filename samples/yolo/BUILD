@@ -43,6 +43,8 @@ isaac_app(
         "viewers",
         "yolo",
         "sensors:v4l2_camera",
+        "realsense",
+        "perception",
     ],
 )
 

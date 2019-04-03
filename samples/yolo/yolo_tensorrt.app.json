@@ -5,7 +5,9 @@
     "ml",
     "viewers",
     "yolo",
-    "sensors:v4l2_camera"
+    "sensors:v4l2_camera",
+    "perception",
+    "realsense"
   ],
   "graph": {
     "nodes": [
@@ -23,6 +25,53 @@
           {
             "name": "viewer",
             "type": "isaac::viewers::ColorCameraViewer"
+          }
+        ]
+      },
+      {
+        "name": "camera",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "realsense",
+            "type": "isaac::RealsenseCameraSimple"
+          }
+        ]
+      },
+      {
+        "name": "viewer",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "depth",
+            "type": "isaac::viewers::DepthCameraViewer"
+          },
+          {
+            "name": "color",
+            "type": "isaac::viewers::ColorCameraViewer"
+          }
+        ]
+      },
+      {
+        "name": "point_cloud",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "depth_to_pointcloud",
+            "type": "isaac::perception::DepthImageToPointCloud"
+          },
+          {
+            "name": "viewer",
+            "type": "isaac::viewers::PointCloudViewer"
           }
         ]
       },
@@ -89,6 +138,26 @@
         "target": "yolo_tensorrt_inference/isaac.yolo.YoloTensorRTInference/rgb_image"
       },
       {
+        "source": "camera/realsense/depth",
+        "target": "viewer/depth/depth_listener"
+      },
+      {
+        "source": "camera/realsense/color",
+        "target": "viewer/color/color_listener"
+      },
+      {
+        "source": "camera/realsense/depth",
+        "target": "point_cloud/depth_to_pointcloud/depth"
+      },
+      {
+        "source": "camera/realsense/color",
+        "target": "point_cloud/depth_to_pointcloud/color"
+      },
+      {
+        "source": "point_cloud/depth_to_pointcloud/cloud",
+        "target": "point_cloud/viewer/cloud"
+      },
+      {
         "source": "yolo_tensorrt_inference/isaac.yolo.YoloTensorRTInference/output_detection_tensors",
         "target": "detection_decoder/isaac.ml.DetectionDecoder/input_detection_tensors"
       },
@@ -114,6 +183,40 @@
         "cols": 1280,
         "rows": 720,
         "rate_hz": 10
+      }
+    },
+    "camera": {
+      "realsense": {
+        "cols": 1280,
+        "rows": 720,
+        "framerate": 30,
+        "align_to_color": true,
+        "frame_queue_size": 2,
+        "auto_exposure_priority": false
+      }
+    },
+    "viewer": {
+      "color": {
+        "reduce_scale": 2
+      },
+      "depth": {
+        "reduce_scale": 2,
+        "min_visualization_depth": 0.2,
+        "max_visualization_depth": 5.0,
+        "camera_name": "Realsense",
+        "colormap": [
+          [128,   0,   0],
+          [255,   0,   0],
+          [255, 255,   0],
+          [0,   255, 255],
+          [0,     0, 255],
+          [0,     0, 128]
+        ]
+      }
+    },
+    "point_cloud": {
+      "depth_to_pointcloud": {
+        "use_color": true
       }
     },
     "yolo_tensorrt_inference": {
@@ -152,6 +255,42 @@
               "channels": [
                 {
                   "name": "yolo_tensorrt_inference/v4l2_camera/viewer/Color"
+                }
+              ]
+            },
+            "Realsense - Color": {
+              "renderer": "2d",
+              "dims": {
+                "width": 1280,
+                "height": 720
+              },
+              "channels": [
+                {
+                  "name": "yolo_tensorrt_inference/viewer/color/Color"
+                }
+              ]
+            },
+            "Realsense - Depth": {
+              "renderer": "2d",
+              "dims": {
+                "width": 1280,
+                "height": 720
+              },
+              "channels": [
+                {
+                  "name": "yolo_tensorrt_inference/viewer/depth/Depth"
+                }
+              ]
+            },
+            "Realsense - Points": {
+              "renderer": "3d",
+              "dims": {
+                "width": 1280,
+                "height": 720
+              },
+              "channels": [
+                {
+                  "name": "yolo_tensorrt_inference/point_cloud/viewer/points"
                 }
               ]
             },
